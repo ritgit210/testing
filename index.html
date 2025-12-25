@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritesh Gond | Data Scientist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js"></script>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        .trail-particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            opacity: 1;
+            background: cyan;
+            box-shadow: 0 0 10px cyan, 0 0 25px cyan;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s linear;
+            }
+
+
+
+
+        .custom-cursor {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6),
+                        inset 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .cursor-glow {
+            width: 8px;
+            height: 8px;
+            background: #00ffff;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+        }
+
+        .ripple {
+            position: fixed;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            pointer-events: none;
+            animation: ripple-animation 0.8s ease-out;
+            z-index: 9998;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        #canvas3d {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        }
+
+
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 15px 50px;
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 10px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ffff;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #00ffff;
+            transform: translateY(-2px);
+        }
+
+        section {
+            position: relative;
+            min-height: 100vh;
+            padding: 100px 50px;
+            z-index: 1;
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            gap: 50px;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+            background: linear-gradient(135deg, #1e3a8a, #0a0e27);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            color: #00ffff;
+            animation: float-profile 6s ease-in-out infinite;
+        }
+
+        @keyframes float-profile {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ffff, #0080ff, #00ffff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+        }
+
+        @keyframes gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero h2 {
+            font-size: 32px;
+            color: #aaa;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .hero p {
+            font-size: 18px;
+            max-width: 600px;
+            line-height: 1.6;
+            color: #ccc;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-button {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease 0.9s both;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .section-title {
+            font-size: 48px;
+            margin-bottom: 50px;
+            text-align: center;
+            background: linear-gradient(45deg, #00ffff, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .experience-grid, .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+        }
+
+        .card h3 {
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .card .duration {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .card ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .card ul li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: #00ffff;
+        }
+
+        /* Skills with Icons */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .skill-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .skill-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(0, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .skill-item:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .skill-item:hover {
+            border-color: #00ffff;
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .skill-icon {
+            font-size: 48px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover .skill-icon {
+            transform: scale(1.2) rotateY(360deg);
+        }
+
+        .skill-name {
+            position: relative;
+            z-index: 1;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-info {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .contact-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+            transform: translateX(10px) scale(1.02);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 10s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-100px) translateX(100px);
+            }
+            50% {
+                transform: translateY(-200px) translateX(-50px);
+            }
+            75% {
+                transform: translateY(-100px) translateX(-100px);
+            }
+        }
+
+        .education-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background: rgba(0, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: rgba(0, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+
+        #canvas3d { z-index: 1; }
+        .interactive-bg { z-index: 0; }
+        .floating-particles { z-index: 2; }
+        .hero, nav, sections { z-index: 5; }
+
+
+        .wave {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            animation: wave-animation 4s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes wave-animation {
+            to {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 128, 255, 0.1));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 48px;
+            color: #00ffff;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .image-placeholder {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero h1 { font-size: 48px; }
+            .hero h2 { font-size: 24px; }
+            section { padding: 80px 20px; }
+            nav { padding: 15px 20px; }
+            .nav-links { gap: 15px; }
+            .experience-grid, .project-grid, .education-section {
+                grid-template-columns: 1fr;
+            }
+            .profile-container {
+                width: 300px;
+                height: 300px;
+            }
+            .skills-container {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas3d"></canvas>
+
+    
+    <div class="custom-cursor"></div>
+    <div class="cursor-glow"></div>
+    <div class="interactive-bg"></div>
+
+    <div class="floating-particles" id="particles"></div>
+
+    <nav id="navbar">
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            RG
+        </div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
+            <a href="#skills">Skills</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>RITESH GOND</h1>
+            <h2>Data Scientist | Geophysics Expert</h2>
+            <p>Transforming geoscientific data into actionable insights through advanced machine learning, AI-driven automation, and interactive data visualization</p>
+            <a href="#contact" class="cta-button">Get In Touch</a>
+        </div>
+        <div class="hero-image">
+            <div class="profile-container">
+                <div class="profile-img">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2 class="section-title">Education</h2>
+        <div class="education-section">
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>IIT(ISM) Dhanbad</h3>
+                <div class="duration">Aug 2022 – May 2025 | Dhanbad, Jharkhand</div>
+                <p style="color: #00ffff; margin-top: 10px;">Master of Science and Technology</p>
+                <p style="color: #ccc;">Applied Geophysics</p>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h3>Banaras Hindu University</h3>
+                <div class="duration">Aug 2019 – May 2022 | Varanasi, Uttar Pradesh</div>
+                <p style="color: #00ffff; margin-top: 10px;">Bachelor of Science</p>
+                <p style="color: #ccc;">Physics Honours</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <h2 class="section-title">Experience</h2>
+        <div class="experience-grid">
+            <div class="card">
+                <div class="image-placeholder">
+                    <!-- <img src="inw.jpeg" alt="InnoWave Logo"> -->
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>InnoWave</h3>
+                <div class="duration">Feb 2025 – Ongoing | Bangalore, Karnataka</div>
+                <p style="color: #00ffff; margin-bottom: 15px;">Associate Data Scientist</p>
+                <ul>
+                    <li>Developed LLM agents using OpenAI's o3 mini model for automation, enhancing software Quality Assurance using Jira, Azure, and GitHub API</li>
+                    <li>Integrated AI-driven solutions to streamline testing workflows, improving efficiency in software development</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>Neurons AI</h3>
+                <div class="duration">May 2024 – Jan 2025 | Bangalore, Karnataka</div>
+                <p style="color: #00ffff; margin-bottom: 15px;">Data Science Intern</p>
+                <ul>
+                    <li>Designed an interactive interface to visualize Geospatial data, enabling intuitive exploration and analysis</li>
+                    <li>Analyzed vector and raster data and applied feature engineering to extract critical features for predictive modeling of potential zones</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fab fa-python"></i>
+                </div>
+                <h3>Rezlytix Technologies</h3>
+                <div class="duration">Feb 2024 – May 2024 | Remote</div>
+                <p style="color: #00ffff; margin-bottom: 15px;">Python Developer Intern</p>
+                <ul>
+                    <li>Implemented data validation with Pydantic, managed version control using Git and created PyQt-based GUIs</li>
+                    <li>Developed Python modules for data analysis, DLIS file handling, formation tops plotting, multi-track data interpretation, and lithology interpretation</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h3>IIT Kharagpur</h3>
+                <div class="duration">Dec 2023 – Apr 2024 | Remote</div>
+                <p style="color: #00ffff; margin-bottom: 15px;">Research Intern</p>
+                <ul>
+                    <li>Developed synthetic models and used genetic algorithms to estimate subsurface parameters</li>
+                    <li>Estimated layer density and depth from gravity anomalies in the Sayula Basin, Mexico</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="project-grid">
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>RAG-Based AI Chatbot</h3>
+                <div class="duration">Jan 2025</div>
+                <p style="margin: 15px 0; line-height: 1.6;">Built a chatbot for general and PDF-based Q&A using Groq API with deepseek-r1 and llama3 models. Real-time PDF processing and interactive chat UI for response generation with Pinecone for vector search.</p>
+                <div class="project-tags">
+                    <span class="tag">LLM</span>
+                    <span class="tag">RAG</span>
+                    <span class="tag">Pinecone</span>
+                    <span class="tag">NLP</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>ArXiv Paper Summarizer</h3>
+                <div class="duration">Dec 2024</div>
+                <p style="margin: 15px 0; line-height: 1.6;">Built an app to fetch and summarize ArXiv papers using Hugging Face's DistilBART. Used ArXiv API and NLP models for efficient abstract compression.</p>
+                <div class="project-tags">
+                    <span class="tag">NLP</span>
+                    <span class="tag">Transformers</span>
+                    <span class="tag">API</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h3>3D Seismic Analysis</h3>
+                <div class="duration">Aug 2024 - Nov 2024</div>
+                <p style="margin: 15px 0; line-height: 1.6;">Enabled real-time 2D/3D visualizations and performed seismic attribute analysis to enhance subsurface interpretation. Applied DBSCAN to identify geobodies by clustering 3D data.</p>
+                <div class="project-tags">
+                    <span class="tag">3D Visualization</span>
+                    <span class="tag">DBSCAN</span>
+                    <span class="tag">Geophysics</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="image-placeholder">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Petrophysical Product Development</h3>
+                <div class="duration">Oct 2023 - Dec 2023</div>
+                <p style="margin: 15px 0; line-height: 1.6;">Built Streamlit-based apps for data loading, processing, and interactive analysis. Implemented machine learning (XGBoost, SVR, RF) and deep learning models for prediction.</p>
+                <div class="project-tags">
+                    <span class="tag">ML</span>
+                    <span class="tag">Streamlit</span>
+                    <span class="tag">PyTorch</span>
+                    <span class="tag">XGBoost</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+            <section id="skills">
+                <h2 class="section-title">Technical Skills</h2>
+              
+                <!-- Group 1 -->
+                <h3 class="skill-group-title">Programming & Frameworks</h3>
+                <div class="skills-container">
+                  <div class="skill-item" style="color:#3776ab;">
+                    <div class="skill-icon"><i class="fab fa-python"></i></div>
+                    <div class="skill-name">Python</div>
+                  </div>
+                  <div class="skill-item" style="color:#00c7b7;">
+                    <div class="skill-icon"><i class="fas fa-code"></i></div>
+                    <div class="skill-name">C++</div>
+                  </div>
+                  <div class="skill-item" style="color:#00d9ff;">
+                    <div class="skill-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="skill-name">FastAPI</div>
+                  </div>
+                  <div class="skill-item" style="color:#ff3e00;">
+                    <div class="skill-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="skill-name">GraphQL</div>
+                  </div>
+                  <div class="skill-item" style="color:#61dafb;">
+                    <div class="skill-icon"><i class="fas fa-eye"></i></div>
+                    <div class="skill-name">OpenCV</div>
+                  </div>
+                  <div class="skill-item" style="color:#f7931e;">
+                    <div class="skill-icon"><i class="fas fa-wave-square"></i></div>
+                    <div class="skill-name">Streamlit</div>
+                  </div>
+                </div>
+              
+                <!-- Group 2 -->
+                <h3 class="skill-group-title">Machine Learning, AI & Data</h3>
+                <div class="skills-container">
+                  <div class="skill-item" style="color:#10a37f;">
+                    <div class="skill-icon"><i class="fas fa-brain"></i></div>
+                    <div class="skill-name">OpenAI / LLMs</div>
+                  </div>
+                  <div class="skill-item" style="color:#ff6692;">
+                    <div class="skill-icon"><i class="fas fa-language"></i></div>
+                    <div class="skill-name">NLP</div>
+                  </div>
+                  <div class="skill-item" style="color:#ff6f00;">
+                    <div class="skill-icon"><i class="fas fa-fire"></i></div>
+                    <div class="skill-name">PyTorch</div>
+                  </div>
+                  <div class="skill-item" style="color:#ffca28;">
+                    <div class="skill-icon"><i class="fas fa-cubes"></i></div>
+                    <div class="skill-name">TensorFlow</div>
+                  </div>
+                  <div class="skill-item" style="color:#4db33d;">
+                    <div class="skill-icon"><i class="fas fa-chart-area"></i></div>
+                    <div class="skill-name">XGBoost</div>
+                  </div>
+                  <div class="skill-item" style="color:#5e5ce6;">
+                    <div class="skill-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="skill-name">Matplotlib</div>
+                  </div>
+                </div>
+              
+                <!-- Group 3 -->
+                <h3 class="skill-group-title">Cloud, DevOps & Databases</h3>
+                <div class="skills-container">
+                  <div class="skill-item" style="color:#ff9900;">
+                    <div class="skill-icon"><i class="fab fa-aws"></i></div>
+                    <div class="skill-name">AWS</div>
+                  </div>
+                  <div class="skill-item" style="color:#0089d6;">
+                    <div class="skill-icon"><i class="fab fa-microsoft"></i></div>
+                    <div class="skill-name">Azure</div>
+                  </div>
+                  <div class="skill-item" style="color:#0769ad;">
+                    <div class="skill-icon"><i class="fab fa-docker"></i></div>
+                    <div class="skill-name">Docker</div>
+                  </div>
+                  <div class="skill-item" style="color:#ff6b6b;">
+                    <div class="skill-icon"><i class="fab fa-git-alt"></i></div>
+                    <div class="skill-name">Git</div>
+                  </div>
+                  <div class="skill-item" style="color:#336791;">
+                    <div class="skill-icon"><i class="fas fa-database"></i></div>
+                    <div class="skill-name">PostgreSQL</div>
+                  </div>
+                  <div class="skill-item" style="color:#00758f;">
+                    <div class="skill-icon"><i class="fas fa-database"></i></div>
+                    <div class="skill-name">MySQL</div>
+                  </div>
+                </div>
+              </section>
+              
+              <script>
+                document.addEventListener("mousemove", (e) => {
+                  const particle = document.createElement("div");
+                  particle.className = "trail-particle";
+                
+                  particle.style.left = e.clientX + "px";
+                  particle.style.top = e.clientY + "px";
+                
+                  document.body.appendChild(particle);
+                
+                  // Animate size + fade
+                  const size = Math.random() * 10 + 5;
+                  particle.style.width = size + "px";
+                  particle.style.height = size + "px";
+                
+                  // drift movement
+                  const driftX = (Math.random() - 0.5) * 80;
+                  const driftY = (Math.random() - 0.5) * 80;
+                
+                  particle.animate(
+                    [
+                      { transform: `translate(-50%, -50%)`, opacity: 1 },
+                      { transform: `translate(${driftX}px, ${driftY}px)`, opacity: 0 }
+                    ],
+                    {
+                      duration: 800 + Math.random() * 400,
+                      easing: "ease-out",
+                      fill: "forwards"
+                    }
+                  );
+                
+                  // remove from DOM
+                  setTimeout(() => {
+                    particle.remove();
+                  }, 1200);
+                });
+                </script>
+   
+<!-- 
+
+   <script>
+window.addEventListener("load", () => {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("canvas3d"),
+        alpha: true,
+        antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.position.z = 3;
+
+    // const geometry = new THREE.TorusKnotGeometry(0.8, 0.25, 150, 20);
+    // const material = new THREE.MeshStandardMaterial({
+    //     color: 0x00ffff,
+    //     metalness: 0.6,
+    //     roughness: 0.2
+    // });
+    // const mesh = new THREE.Mesh(geometry, material);
+    // scene.add(mesh);
+
+    // const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+    // const material = new THREE.MeshStandardMaterial({
+    // color: 0x00ffff,
+    // metalness: 0.6,
+    // roughness: 0.2
+    // });
+    // const mesh = new THREE.Mesh(geometry, material);
+    // scene.add(mesh);
+
+
+    const geometry = new THREE.IcosahedronGeometry(1.2, 0);
+    const material = new THREE.MeshStandardMaterial({
+    color: 0x00ffff,
+    wireframe: true,
+    metalness: 0.7,
+    roughness: 0.2
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+        
+
+    const light = new THREE.PointLight(0xffffff, 2);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+
+    // --- Mouse tracking ---
+    const mouse = { x: 0, y: 0 };
+    document.addEventListener("mousemove", (event) => {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1; // -1 to 1
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; // -1 to 1
+    });
+
+    // --- Waves on click ---
+    const ringGeo = new THREE.RingGeometry(0.5, 0.55, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true });
+
+    function createWave(x = 0, y = 0) {
+        const ring = new THREE.Mesh(ringGeo, ringMat.clone());
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.set(x, 0.01, y);
+        scene.add(ring);
+
+        let scale = 1;
+        const maxScale = 10;
+        function animateWave() {
+            scale += 0.1;
+            ring.scale.set(scale, scale, scale);
+            ring.material.opacity = 1 - scale / maxScale;
+            if (scale < maxScale) requestAnimationFrame(animateWave);
+            else scene.remove(ring);
+        }
+        animateWave();
+    }
+
+    window.addEventListener("click", (event) => {
+        const x = (event.clientX / window.innerWidth - 0.5) * 10;
+        const y = (0.5 - event.clientY / window.innerHeight) * 10;
+        createWave(x, y);
+    });
+
+    // --- Animate ---
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // rotate mesh toward mouse
+        const rotationSpeed = 0.05; 
+        mesh.rotation.y += (mouse.x * Math.PI/4 - mesh.rotation.y) * rotationSpeed;
+        mesh.rotation.x += (mouse.y * Math.PI/4 - mesh.rotation.x) * rotationSpeed;
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // --- Resize ---
+    window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+});
+</script> -->
+
+
+
+<script>
+window.addEventListener("load", () => {
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+    );
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("canvas3d"),
+        alpha: true,
+        antialias: true
+    });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.position.z = 5;
+
+    // --- MAIN WIRE-FRAME CUBE ---
+    const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+    const cubeMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x00ffff, 
+        metalness: 0.6, 
+        roughness: 0.2, 
+        wireframe: true 
+    });
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    scene.add(cube);
+
+    // --- ORBITING NODES ---
+    const nodeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const nodeMaterial = new THREE.MeshStandardMaterial({ color: 0xff00ff });
+
+    const nodes = [];
+    const nodeCount = 8;
+    for (let i = 0; i < nodeCount; i++) {
+        const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
+        const angle = (i / nodeCount) * Math.PI * 2;
+        node.position.set(Math.cos(angle) * 2, Math.sin(angle) * 2, Math.sin(angle) * 2);
+        scene.add(node);
+        nodes.push(node);
+    }
+
+    // --- LIGHTS ---
+    const light = new THREE.PointLight(0xffffff, 2);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    scene.add(ambientLight);
+
+    // --- MOUSE CONTROL ---
+    const mouse = { x: 0, y: 0 };
+    document.addEventListener("mousemove", (event) => {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    // --- CLICK WAVES ---
+    const ringGeo = new THREE.RingGeometry(0.5, 0.55, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true });
+
+    function createWave(x = 0, y = 0) {
+        const ring = new THREE.Mesh(ringGeo, ringMat.clone());
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.set(x, 0.01, y);
+        scene.add(ring);
+
+        let scale = 1;
+        const maxScale = 10;
+
+        function animateWave() {
+            scale += 0.1;
+            ring.scale.set(scale, scale, scale);
+            ring.material.opacity = 1 - scale / maxScale;
+            if (scale < maxScale) requestAnimationFrame(animateWave);
+            else scene.remove(ring);
+        }
+        animateWave();
+    }
+
+    window.addEventListener("click", (event) => {
+        const x = (event.clientX / window.innerWidth - 0.5) * 10;
+        const y = (0.5 - event.clientY / window.innerHeight) * 10;
+        createWave(x, y);
+    });
+
+    // // --- ANIMATE ---
+    // function animate() {
+    //     requestAnimationFrame(animate);
+
+    //     // rotate cube toward mouse
+    //     const rotationSpeed = 0.05;
+    //     cube.rotation.y += (mouse.x * Math.PI/4 - cube.rotation.y) * rotationSpeed;
+    //     cube.rotation.x += (mouse.y * Math.PI/4 - cube.rotation.x) * rotationSpeed;
+
+    //     // orbit nodes around cube
+    //     nodes.forEach((node, i) => {
+    //         node.position.x = Math.cos(Date.now() * 0.001 + i) * 2;
+    //         node.position.z = Math.sin(Date.now() * 0.001 + i) * 2;
+    //     });
+
+    //     renderer.render(scene, camera);
+    // }
+    // animate();
+
+    // --- RESIZE HANDLING ---
+    window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+});
+</script>
+
+
+
+
+
+</body> 
