@@ -1,8 +1,32 @@
+// Hero description: slow one-time typewriter reveal on load
+const descEl = document.querySelector('.intro-text p');
 
-window.addEventListener('load', () => {
-    cube.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-    cube.classList.remove('unfolded');
-});
+if (descEl) {
+    const fullText = descEl.textContent;
+    descEl.textContent = '';
+
+    const typedSpan = document.createElement('span');
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'typewriter-cursor';
+    cursorSpan.textContent = '|';
+
+    descEl.appendChild(typedSpan);
+    descEl.appendChild(cursorSpan);
+
+    let charIndex = 0;
+
+    function tickDescTypewriter() {
+        charIndex++;
+        typedSpan.textContent = fullText.slice(0, charIndex);
+        if (charIndex < fullText.length) {
+            setTimeout(tickDescTypewriter, 30);
+        } else {
+            cursorSpan.remove();
+        }
+    }
+
+    setTimeout(tickDescTypewriter, 400);
+}
 
 // Custom Cursor
 const cursor = document.querySelector('.custom-cursor');
@@ -32,89 +56,10 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Hide scroll indicator after first scroll
-const scrollContainer = document.querySelector('.scroll-container');
-const scrollIndicator = document.querySelector('.scroll-indicator');
-
-scrollContainer.addEventListener('scroll', () => {
-    if (scrollContainer.scrollTop > 100) {
-        scrollIndicator.style.opacity = '0';
-    } else {
-        scrollIndicator.style.opacity = '1';
-    }
-});
-
-// Experience Section Cube Animation
-const cube = document.getElementById('cube');
-const experienceSection = document.querySelector('.experience-section');
-const cubeScrollIndicator = document.getElementById('scrollIndicator');
-
-scrollContainer.addEventListener('scroll', () => {
-    const sectionTop = experienceSection.offsetTop - scrollContainer.offsetTop;
-    const sectionHeight = experienceSection.offsetHeight;
-    const scrollPosition = scrollContainer.scrollTop;
-
-    // Calculate scroll progress within the experience section
-    let scrollProgress = (scrollPosition - sectionTop) / (sectionHeight);
-    if (scrollPosition < sectionTop) scrollProgress = 0;
-    if (scrollPosition > sectionTop + sectionHeight) scrollProgress = 1;
-
-    const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
-
-    // Phase 1: Rotate cube (0–75% of scroll)
-
-    if (clampedProgress < 0.75) {
-        const rotationProgress = clampedProgress / 0.75;
-
-        // correct order: 1 → 2 → 3 → 4
-        const rotationY = -rotationProgress * 270;
-
-        const rotationX = Math.sin(rotationProgress * Math.PI) * 15;
-
-        cube.classList.remove('unfolded');
-
-        const sectionHeader = document.querySelector('.experience-section .section-header');
-        if (sectionHeader) sectionHeader.classList.remove('title-up');
-
-        cube.style.transform = `rotateY(${rotationY}deg) rotateX(${rotationX}deg) scale(1)`;
-
-        if (cubeScrollIndicator) cubeScrollIndicator.classList.remove('hidden');
-    }
-
-    // Phase 2: Unfold cube flat (75–100% of scroll)
-    else {
-        const unfoldProgress = (clampedProgress - 0.75) / 0.25;
-
-        // Reset cube orientation and scale down
-        const scaleValue = 1 - (0.5 * unfoldProgress);
-
-        // Remove 3D rotation, keep cube flat
-        cube.style.transform = `rotateY(0deg) rotateX(0deg) scale(${scaleValue})`;
-
-        // Add unfolded class
-        cube.classList.add('unfolded');
-
-        // Move title up when unfolded
-        const sectionHeader = document.querySelector('.experience-section .section-header');
-        if (sectionHeader) {
-            sectionHeader.classList.add('title-up');
-        }
-
-        // Hide scroll indicator when unfolded
-        if (cubeScrollIndicator) {
-            if (unfoldProgress > 0.2) {
-                cubeScrollIndicator.classList.add('hidden');
-            } else {
-                cubeScrollIndicator.classList.remove('hidden');
-            }
-        }
-    }
-});
-
 // Intersection Observer for fade-in animations
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    rootMargin: '0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -132,4 +77,48 @@ document.querySelectorAll('.card, .project-card, .skill-item').forEach(el => {
     el.style.transform = 'translateY(30px)';
     el.style.transition = 'all 0.6s ease';
     observer.observe(el);
+});
+
+// Experience cards: hover to expand + reveal project workflow(s)
+const experienceGrid = document.querySelector('.experience-grid');
+const experienceTimeline = document.querySelector('.experience-timeline');
+
+if (experienceGrid) {
+    const expCards = Array.from(experienceGrid.querySelectorAll('.card'));
+
+    expCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            expCards.forEach(c => {
+                c.classList.toggle('is-active', c === card);
+                c.classList.toggle('is-inactive', c !== card);
+            });
+            // Timeline markers line up with the default equal-width cards,
+            // so dim it while a card is expanded and no longer aligned.
+            if (experienceTimeline) experienceTimeline.classList.add('dimmed');
+        });
+    });
+
+    experienceGrid.addEventListener('mouseleave', () => {
+        expCards.forEach(c => c.classList.remove('is-active', 'is-inactive'));
+        if (experienceTimeline) experienceTimeline.classList.remove('dimmed');
+    });
+}
+
+// Project cards: same hover-to-expand + reveal workflow behavior as Experience,
+// scoped independently per grid (AI Projects, Geo Projects).
+document.querySelectorAll('.projects-grid').forEach(grid => {
+    const projectCards = Array.from(grid.querySelectorAll('.project-card'));
+
+    projectCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            projectCards.forEach(c => {
+                c.classList.toggle('is-active', c === card);
+                c.classList.toggle('is-inactive', c !== card);
+            });
+        });
+    });
+
+    grid.addEventListener('mouseleave', () => {
+        projectCards.forEach(c => c.classList.remove('is-active', 'is-inactive'));
+    });
 });

@@ -217,11 +217,12 @@ section {
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 20px;
-    background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, #fff, var(--primary), var(--secondary), #fff);
+    background-size: 300% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: fadeInUp 0.8s ease;
+    animation: fadeInUp 0.8s ease, gradientShimmer 6s ease-in-out infinite;
     transform: translateZ(50px) rotateX(5deg);
     text-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
     transition: transform 0.3s ease;
@@ -229,6 +230,11 @@ section {
 
 .intro-text h1:hover {
     transform: translateZ(80px) rotateX(2deg) scale(1.02);
+}
+
+@keyframes gradientShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 .intro-text h2 {
@@ -243,6 +249,18 @@ section {
 
 .intro-text h2:hover {
     transform: translateZ(50px) rotateX(1deg);
+}
+
+.typewriter-cursor {
+    display: inline-block;
+    margin-left: 2px;
+    color: var(--primary);
+    animation: cursorBlink 0.8s step-end infinite;
+}
+
+@keyframes cursorBlink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
 }
 
 .intro-text p {
@@ -498,129 +516,496 @@ section {
 
 /* 3. EXPERIENCE SECTION */
 .experience-section {
-    min-height: 800vh;
-    margin-top: 0;
-    margin-bottom: 0;
     background: var(--dark);
-    position: relative;
-    padding: 120px 60px 60px;
-    display: block;
+    padding: 100px 40px 24px;
+    align-items: stretch;
+}
+
+.experience-section .section-content {
+    display: flex;
+    flex-direction: column;
 }
 
 .experience-section .section-header {
-    text-align: center;
-    margin-bottom: 150px;
-    position: sticky;
-    top: 120px;
-    z-index: 10;
-    transition: top 0.5s ease;
+    margin-bottom: 18px;
 }
 
-.experience-section .section-header.title-up {
-    top: 100px;
+.experience-section .experience-grid {
+    margin-bottom: auto;
+}
+
+/* Timeline strip: one marker per card, aligned above it. Reads left (earliest) to
+   right (current), matching the card order below. Sits right above the cards
+   (not pinned near the header) so the whole timeline+cards block centers as one unit. */
+.experience-timeline {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+    margin-top: auto;
+    margin-bottom: 18px;
+    transition: opacity 0.4s ease;
+}
+
+.experience-timeline.dimmed {
+    opacity: 0.25;
+}
+
+.timeline-track {
+    position: absolute;
+    top: 7px;
+    left: 0;
+    right: 14px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.12), var(--primary));
+    z-index: 0;
+}
+
+.timeline-track::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -13px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid var(--primary);
+    transform: translateY(-50%);
+}
+
+.timeline-marker {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.timeline-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--dark);
+    border: 2px solid var(--primary);
+}
+
+.timeline-marker.current .timeline-dot {
+    background: var(--primary);
+    box-shadow: 0 0 0 4px rgba(0, 255, 255, 0.2), 0 0 10px 2px rgba(0, 255, 255, 0.5);
+    animation: timelinePulse 2s ease-in-out infinite;
+}
+
+@keyframes timelinePulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(0, 255, 255, 0.2), 0 0 10px 2px rgba(0, 255, 255, 0.5); }
+    50% { box-shadow: 0 0 0 7px rgba(0, 255, 255, 0.08), 0 0 14px 4px rgba(0, 255, 255, 0.7); }
+}
+
+.timeline-range {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    text-align: center;
+}
+
+.timeline-marker.current .timeline-range {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.experience-section .section-header h2 {
+    font-size: 42px;
+    margin-bottom: 8px;
+}
+
+.experience-section .section-header p {
+    font-size: 15px;
+}
+
+.experience-grid {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+}
+
+.experience-grid .card {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 348px;
+    padding: 14px 14px;
+    transition: flex-grow 2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.experience-grid .card.is-active {
+    flex-grow: 7;
+}
+
+.experience-grid .card.is-inactive {
+    flex-grow: 0.32;
+}
+
+.experience-grid .card-face {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.5s ease;
+}
+
+.experience-grid .card.is-inactive .card-face {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.experience-grid .strip-label {
+    display: none;
+}
+
+.experience-grid .card.is-inactive .strip-label {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+    animation: stripFadeIn 0.5s ease 0.3s forwards;
+}
+
+@keyframes stripFadeIn {
+    to { opacity: 1; }
+}
+
+.experience-grid .strip-label span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.experience-grid .strip-label .company-logo {
+    margin-bottom: 0;
+}
+
+.experience-grid .company-logo {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+    border-radius: 9px;
+    margin-bottom: 8px;
+}
+
+.experience-grid .card h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.experience-grid .duration {
+    font-size: 11.5px;
+    margin-bottom: 4px;
+}
+
+.experience-grid .role {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+/* Content swap: bullets <-> workflow diagram, stacked in the same box.
+   Absolutely positioned (not grid) so neither one's natural content size
+   can inflate the other's box and push content past the card's fixed height. */
+.experience-grid .content-swap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+.experience-grid .content-swap > * {
+    position: absolute;
+    inset: 0;
+}
+
+.experience-grid .card-bullets {
+    display: flex;
+    flex-wrap: wrap;
+    align-self: start;
+    align-content: start;
+    gap: 8px;
+    transition: opacity 0.3s ease;
+}
+
+.experience-grid .card-bullets li {
+    flex: 1 1 45%;
+    min-width: 130px;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 9px 11px;
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0;
+}
+
+.experience-grid .card-bullets li::before {
+    content: none;
+}
+
+.experience-grid .card.is-active .card-bullets {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.experience-grid .workflow-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.experience-grid .card.is-active .workflow-panel {
     opacity: 1;
     pointer-events: auto;
 }
 
-.experience-section .section-header h2 {
-    font-size: 48px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-}
-
-.experience-section .section-header p {
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.cube-container {
-    position: sticky;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 600px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    perspective: 2000px;
-    margin: 0 auto;
-    margin-top: 350px;
-}
-
-.cube {
-    width: 500px;
-    height: 500px;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.3s ease-out;
-}
-
-.cube-face {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 2px solid rgba(0, 255, 255, 0.3);
-    border-radius: 24px;
-    padding: 40px;
+/* Every project's flow shows as its own compact block (not one-at-a-time):
+   title on its own line, with a little breathing room above the steps below it */
+.workflow-flow {
     display: flex;
     flex-direction: column;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
-    transition: all 0.8s ease;
+    align-items: flex-start;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.cube-face::before {
+.card.is-active .workflow-flow {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.workflow-flow:nth-child(1) { --row-delay: 0s; }
+.workflow-flow:nth-child(2) { --row-delay: 0.5s; }
+.workflow-flow:nth-child(3) { --row-delay: 1s; }
+.workflow-flow:nth-child(4) { --row-delay: 1.5s; }
+
+.card.is-active .workflow-flow:nth-child(1) { transition-delay: 0s; }
+.card.is-active .workflow-flow:nth-child(2) { transition-delay: 0.25s; }
+.card.is-active .workflow-flow:nth-child(3) { transition-delay: 0.5s; }
+.card.is-active .workflow-flow:nth-child(4) { transition-delay: 0.75s; }
+
+.workflow-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.workflow-steps {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* Nodes: fill up like liquid, left to right, while "processing" that step */
+.wf-step {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    background: #0d1330;
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 7px;
+    padding: 6px 9px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.wf-step::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
-    border-radius: 24px;
-    z-index: -1;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.32), rgba(0, 255, 255, 0.14));
+    transform: scaleX(0);
+    transform-origin: left center;
+    z-index: 0;
 }
 
-.face-front {
-    transform: translateZ(250px);
+.wf-step i,
+.wf-step span {
+    position: relative;
+    z-index: 1;
 }
 
-.face-back {
-    transform: rotateY(180deg) translateZ(250px);
+.wf-step i {
+    font-size: 13px;
+    color: var(--primary);
 }
 
-.face-right {
-    transform: rotateY(90deg) translateZ(250px);
+/* Total row cycle: 5 fills (1s each) + 4 transfers (0.4s each) + a pause, then every
+   node drains back to empty together right before the sequence restarts at node 1 */
+.card.is-active .wf-step::before {
+    animation-duration: 7.4s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-delay: var(--row-delay, 0s);
 }
 
-.face-left {
-    transform: rotateY(-90deg) translateZ(250px);
+.workflow-steps > .wf-step:nth-child(1)::before { animation-name: wfNode1Fill; }
+.workflow-steps > .wf-step:nth-child(3)::before { animation-name: wfNode2Fill; }
+.workflow-steps > .wf-step:nth-child(5)::before { animation-name: wfNode3Fill; }
+.workflow-steps > .wf-step:nth-child(7)::before { animation-name: wfNode4Fill; }
+.workflow-steps > .wf-step:nth-child(9)::before { animation-name: wfNode5Fill; }
+
+@keyframes wfNode1Fill {
+    0% { transform: scaleX(0); }
+    13.5% { transform: scaleX(1); }
+    93.2% { transform: scaleX(1); }
+    98.6% { transform: scaleX(0); }
+    100% { transform: scaleX(0); }
 }
 
-/* Unfolded state */
-.cube.unfolded .face-front {
-    transform: translateZ(0) translateX(-750px) translateY(100px);
+@keyframes wfNode2Fill {
+    0%, 18.9% { transform: scaleX(0); }
+    32.4% { transform: scaleX(1); }
+    93.2% { transform: scaleX(1); }
+    98.6% { transform: scaleX(0); }
+    100% { transform: scaleX(0); }
 }
 
-.cube.unfolded .face-right {
-    transform: rotateY(0deg) translateZ(0) translateX(-250px) translateY(100px);
+@keyframes wfNode3Fill {
+    0%, 37.8% { transform: scaleX(0); }
+    51.4% { transform: scaleX(1); }
+    93.2% { transform: scaleX(1); }
+    98.6% { transform: scaleX(0); }
+    100% { transform: scaleX(0); }
 }
 
-.cube.unfolded .face-back {
-    transform: rotateY(0deg) translateZ(0) translateX(250px) translateY(100px);
+@keyframes wfNode4Fill {
+    0%, 56.8% { transform: scaleX(0); }
+    70.3% { transform: scaleX(1); }
+    93.2% { transform: scaleX(1); }
+    98.6% { transform: scaleX(0); }
+    100% { transform: scaleX(0); }
 }
 
-.cube.unfolded .face-left {
-    transform: rotateY(0deg) translateZ(0) translateX(750px) translateY(100px);
+@keyframes wfNode5Fill {
+    0%, 75.7% { transform: scaleX(0); }
+    89.2% { transform: scaleX(1); }
+    93.2% { transform: scaleX(1); }
+    98.6% { transform: scaleX(0); }
+    100% { transform: scaleX(0); }
 }
 
-.cube.unfolded .cube-face {
-    border-color: rgba(0, 255, 255, 0.5);
-    box-shadow: 0 0 60px rgba(0, 255, 255, 0.3);
+/* Edges: once a node is full, a flash hops across the connector to the next node */
+.wf-arrow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.wf-arrow::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 4px 1.5px var(--primary), 0 0 8px 3px rgba(0, 255, 255, 0.3);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.card.is-active .wf-arrow::after {
+    animation-duration: 7.4s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-delay: var(--row-delay, 0s);
+}
+
+.workflow-steps > .wf-arrow:nth-child(2)::after { animation-name: wfEdge1Travel; }
+.workflow-steps > .wf-arrow:nth-child(4)::after { animation-name: wfEdge2Travel; }
+.workflow-steps > .wf-arrow:nth-child(6)::after { animation-name: wfEdge3Travel; }
+.workflow-steps > .wf-arrow:nth-child(8)::after { animation-name: wfEdge4Travel; }
+
+@keyframes wfEdge1Travel {
+    0%, 13.4% { opacity: 0; transform: translateX(0); }
+    13.6% { opacity: 1; transform: translateX(0); }
+    18.7% { opacity: 1; transform: translateX(18px); }
+    18.9%, 100% { opacity: 0; transform: translateX(18px); }
+}
+
+@keyframes wfEdge2Travel {
+    0%, 32.3% { opacity: 0; transform: translateX(0); }
+    32.5% { opacity: 1; transform: translateX(0); }
+    37.6% { opacity: 1; transform: translateX(18px); }
+    37.8%, 100% { opacity: 0; transform: translateX(18px); }
+}
+
+@keyframes wfEdge3Travel {
+    0%, 51.3% { opacity: 0; transform: translateX(0); }
+    51.5% { opacity: 1; transform: translateX(0); }
+    56.6% { opacity: 1; transform: translateX(18px); }
+    56.8%, 100% { opacity: 0; transform: translateX(18px); }
+}
+
+@keyframes wfEdge4Travel {
+    0%, 70.2% { opacity: 0; transform: translateX(0); }
+    70.4% { opacity: 1; transform: translateX(0); }
+    75.5% { opacity: 1; transform: translateX(18px); }
+    75.7%, 100% { opacity: 0; transform: translateX(18px); }
+}
+
+/* Single-project cards have room to spare below one row — scale the nodes up to use it */
+.workflow-panel > .workflow-flow:only-child .workflow-title {
+    font-size: 14px;
+}
+
+.workflow-panel > .workflow-flow:only-child .workflow-steps {
+    gap: 9px;
+}
+
+.workflow-panel > .workflow-flow:only-child .wf-step {
+    gap: 7px;
+    padding: 11px 15px;
+    font-size: 13px;
+    border-radius: 9px;
+}
+
+.workflow-panel > .workflow-flow:only-child .wf-step i {
+    font-size: 18px;
+}
+
+.workflow-panel > .workflow-flow:only-child .wf-arrow {
+    font-size: 17px;
+}
+
+.workflow-panel > .workflow-flow:only-child .wf-arrow::after {
+    width: 9px;
+    height: 9px;
+    margin-top: -4.5px;
 }
 
 .company-logo {
@@ -636,12 +1021,6 @@ section {
     margin-bottom: 20px;
 }
 
-.cube-face h3 {
-    font-size: 24px;
-    margin-bottom: 5px;
-    color: var(--primary);
-}
-
 .duration {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.5);
@@ -654,12 +1033,12 @@ section {
     margin-bottom: 15px;
 }
 
-.cube-face ul {
+.card ul {
     list-style: none;
     padding: 0;
 }
 
-.cube-face ul li {
+.card ul li {
     padding-left: 25px;
     margin-bottom: 12px;
     position: relative;
@@ -668,7 +1047,7 @@ section {
     font-size: 14px;
 }
 
-.cube-face ul li::before {
+.card ul li::before {
     content: '→';
     position: absolute;
     left: 0;
@@ -676,39 +1055,28 @@ section {
     font-weight: bold;
 }
 
-.scroll-indicator {
-    position: fixed;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
+.certifications {
+    margin-top: 50px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 14px;
-    z-index: 100;
-    transition: opacity 0.3s ease;
 }
 
-.scroll-indicator i {
-    display: block;
-    font-size: 24px;
-    animation: bounce 2s infinite;
+.certifications h3 {
+    font-size: 22px;
     color: var(--primary);
+    margin-bottom: 20px;
 }
 
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-10px);
-    }
-    60% {
-        transform: translateY(-5px);
-    }
+.certifications ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.scroll-indicator.hidden {
-    opacity: 0;
+.certifications li {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 15px;
 }
 
 /* 4 & 5. PROJECTS SECTIONS */
@@ -717,17 +1085,20 @@ section {
 }
 
 .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 40px;
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
 }
 
 .project-card {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 600px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 24px;
     overflow: hidden;
-    transition: all 0.4s ease;
+    transition: all 0.4s ease, flex-grow 2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
@@ -735,6 +1106,67 @@ section {
     transform: translateY(-10px);
     border-color: rgba(0, 255, 255, 0.3);
     box-shadow: 0 30px 60px rgba(0, 255, 255, 0.2);
+}
+
+.project-card.is-active {
+    flex-grow: 7;
+}
+
+.project-card.is-inactive {
+    flex-grow: 0.32;
+}
+
+/* card-face wraps the normal image+info content; it fades out when the card
+   shrinks to a strip so the strip-label (below) can take over, exactly like
+   the Experience section's .card-face / .strip-label pair. */
+.card-face {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.5s ease;
+}
+
+.project-card.is-inactive .card-face {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.projects-grid .strip-label {
+    display: none;
+}
+
+.project-card.is-inactive .strip-label {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+    animation: stripFadeIn 0.5s ease 0.3s forwards;
+}
+
+.projects-grid .strip-label span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.strip-label .project-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .project-image {
@@ -747,6 +1179,7 @@ section {
     color: var(--primary);
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .project-image::before {
@@ -765,13 +1198,46 @@ section {
 }
 
 .project-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     padding: 30px;
 }
 
 .project-info h3 {
     font-size: 22px;
-    margin-bottom: 10px;
     color: var(--primary);
+}
+
+.project-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.project-link {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(0, 255, 255, 0.08);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    color: var(--primary);
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.project-link:hover {
+    background: rgba(0, 255, 255, 0.2);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 255, 255, 0.25);
 }
 
 .project-info .date {
@@ -786,10 +1252,67 @@ section {
     margin-bottom: 20px;
 }
 
+/* Content swap: description+tags <-> workflow diagram, stacked in the same box —
+   same technique as the Experience section's .content-swap. */
+.project-info .content-swap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+.project-info .content-swap > * {
+    position: absolute;
+    inset: 0;
+}
+
+.project-details {
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.3s ease;
+}
+
+.project-card.is-active .project-details {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.project-info .workflow-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.project-card.is-active .workflow-panel {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.project-card.is-active .workflow-flow {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.project-card.is-active .wf-step::before {
+    animation-duration: 7.4s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.project-card.is-active .wf-arrow::after {
+    animation-duration: 7.4s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
 .tags {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-top: auto;
 }
 
 .tag {
@@ -810,30 +1333,66 @@ section {
 /* 6. SKILLS SECTION */
 .skills-section {
     background: var(--darker);
+    padding: 100px 40px 20px;
+}
+
+.skills-section .section-header {
+    margin-bottom: 14px;
+}
+
+.skills-section .section-header h2 {
+    font-size: 32px;
+    margin-bottom: 6px;
+}
+
+.skills-section .section-header p {
+    font-size: 13px;
 }
 
 .skills-category {
-    margin-bottom: 60px;
+    margin-bottom: 28px;
+}
+
+.skills-category:last-child {
+    margin-bottom: 0;
+}
+
+.skills-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.skills-row .skills-category {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
 }
 
 .skills-category h3 {
-    font-size: 32px;
-    margin-bottom: 30px;
+    font-size: 13px;
+    margin-bottom: 5px;
     color: var(--primary);
     text-align: center;
 }
 
 .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(78px, 88px));
+    justify-content: center;
+    gap: 8px;
 }
 
 .skill-item {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 30px 20px;
+    border-radius: 12px;
+    padding: 6px;
     text-align: center;
     transition: all 0.4s ease;
     position: relative;
@@ -854,19 +1413,19 @@ section {
 }
 
 .skill-item:hover::before {
-    width: 300px;
-    height: 300px;
+    width: 200px;
+    height: 200px;
 }
 
 .skill-item:hover {
-    transform: translateY(-10px) scale(1.05);
+    transform: translateY(-3px) scale(1.04);
     border-color: rgba(0, 255, 255, 0.5);
-    box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 255, 255, 0.2);
 }
 
 .skill-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
+    font-size: 16px;
+    margin-bottom: 3px;
     position: relative;
     z-index: 1;
     transition: transform 0.4s ease;
@@ -877,8 +1436,9 @@ section {
 }
 
 .skill-name {
-    font-size: 14px;
+    font-size: 9px;
     font-weight: 600;
+    line-height: 1.2;
     position: relative;
     z-index: 1;
 }
@@ -961,12 +1521,6 @@ section {
 }
 
 /* Responsive */
-@media (max-width: 1400px) {
-    .cube.unfolded {
-        transform: scale(0.7);
-    }
-}
-
 @media (max-width: 1024px) {
     .intro-content {
         grid-template-columns: 1fr;
@@ -983,9 +1537,59 @@ section {
         height: 250px;
         font-size: 80px;
     }
+
+    .experience-grid {
+        flex-wrap: wrap;
+    }
+
+    .experience-grid .card {
+        flex: 1 1 45%;
+        height: auto;
+    }
+
+    .experience-grid .card.is-active,
+    .experience-grid .card.is-inactive {
+        flex-grow: 1;
+    }
+
+    .experience-grid .card.is-inactive .card-face {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .experience-grid .strip-label {
+        display: none !important;
+    }
+
+    .projects-grid {
+        flex-wrap: wrap;
+    }
+
+    .project-card {
+        flex: 1 1 45%;
+        height: auto;
+    }
+
+    .project-card.is-active,
+    .project-card.is-inactive {
+        flex-grow: 1;
+    }
+
+    .project-card.is-inactive .card-face {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .projects-grid .strip-label {
+        display: none !important;
+    }
 }
 
 @media (max-width: 768px) {
+    .skills-row {
+        flex-direction: column;
+    }
+
     nav {
         padding: 20px 30px;
     }
@@ -1010,66 +1614,29 @@ section {
         font-size: 40px;
     }
 
-    .cards-grid,
-    .projects-grid {
+    .cards-grid {
         grid-template-columns: 1fr;
+    }
+
+    .experience-grid,
+    .projects-grid {
+        flex-direction: column;
+    }
+
+    .experience-grid .card,
+    .project-card {
+        flex: 1 1 auto;
     }
 
     .cta-buttons {
         flex-direction: column;
     }
 
-    .cube,
-    .cube-face {
-        width: 350px;
-        height: 350px;
-    }
-
-    .face-front {
-        transform: translateZ(175px);
-    }
-
-    .face-back {
-        transform: rotateY(180deg) translateZ(175px);
-    }
-
-    .face-right {
-        transform: rotateY(90deg) translateZ(175px);
-    }
-
-    .face-left {
-        transform: rotateY(-90deg) translateZ(175px);
-    }
-
-    .cube.unfolded .face-front {
-        transform: translateZ(0) translateY(-525px);
-    }
-
-    .cube.unfolded .face-right {
-        transform: rotateY(0deg) translateZ(0) translateY(-175px);
-    }
-
-    .cube.unfolded .face-back {
-        transform: rotateY(0deg) translateZ(0) translateY(175px);
-    }
-
-    .cube.unfolded .face-left {
-        transform: rotateY(0deg) translateZ(0) translateY(525px);
-    }
-
-    .cube-face {
-        padding: 25px;
-    }
-
-    .cube-face h3 {
-        font-size: 20px;
-    }
-
     .role {
         font-size: 16px;
     }
 
-    .cube-face ul li {
+    .card ul li {
         font-size: 13px;
     }
 }
